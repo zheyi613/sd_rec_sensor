@@ -133,8 +133,6 @@ int main(void)
   DWT_Init();
   HAL_Delay(100);
   /* Initialize SD double buffer */
-  uint32_t free;
-
   sd_idle_buf_ptr = sd_buffer[0];
   memset(sd_buffer[0], 0, SD_BUFFER_SIZE);
   memset(sd_buffer[1], 0, SD_BUFFER_SIZE);
@@ -156,14 +154,6 @@ int main(void)
   }
   fres = f_open(&fil, "test1.txt", FA_CREATE_ALWAYS | FA_READ | FA_WRITE);
   if (fres != FR_OK) {
-    Error_Handler();
-  }
-  fres = f_getfree("", &fre_clust, &pfs);
-  if (fres != FR_OK) {
-    Error_Handler();
-  }
-  free = (uint32_t)(fre_clust * pfs->csize * 0.5);
-  if (free < 1) {
     Error_Handler();
   }
 
