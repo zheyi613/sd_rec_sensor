@@ -83,7 +83,7 @@ SEGGER/Config/SEGGER_SYSVIEW_Config_FreeRTOS.c \
 SEGGER/OS/SEGGER_SYSVIEW_FreeRTOS.c \
 SEGGER/SEGGER/Syscalls/SEGGER_RTT_Syscalls_GCC.c \
 $(wildcard SEGGER/SEGGER/*.c) \
-SEGGER/Rec/segger_uart.c \
+SEGGER/Rec/segger_uart_dma.c \
 Core/Src/rtos_bus.c \
 Core/Src/icm20948.c \
 $(wildcard Drivers/FatFs/Src/*.c) \
