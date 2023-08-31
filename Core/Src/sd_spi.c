@@ -4,6 +4,9 @@
 #include "spi.h"
 #include "rtos_bus.h"
 #include <string.h>
+/* Use OS delay tick to wait timout instead of polling spi */
+#include "FreeRTOS.h"
+#include "task.h"
 
 #define spi_txrx(pTxData, pRxData, size)        \
         spi1_txrx(pTxData, pRxData, size)
@@ -25,6 +28,8 @@
                 hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8; \
                 HAL_SPI_Init(&hspi1);                                   \
         } while (0)
+/* Use OS delay one tick to wait state */
+#define delay_ms(ms)    vTaskDelay(pdMS_TO_TICKS(ms))
 
 #define CMD_SIZE        6      /* 6 bytes long and start with MSB */
 
@@ -78,6 +83,7 @@ static int wait_ready(WORD ms)
         do {
                 cs_high();
                 spi_rx(&token, 1); /* Nds = 1 */
+                delay_ms(2);
                 cs_low();
                 spi_rx(&token, 1);
         } while ((token != 0xFF) && Timer2);
@@ -207,8 +213,10 @@ DSTATUS disk_initialize(BYTE drv)
         }
         cs_low();
         i = 10; /* Try to reset SD card 10 times */
-        while ((send_cmd(CMD0, 0) != 0x01) && --i)
-                ;
+        do {
+                resp[0] = send_cmd(ACMD41, 1UL << 30);
+                delay_ms(2);
+        } while (resp[0] && Timer1);
         if (!i)
                 return stat;
         /* Send interface condition command, arg: 01(VHS) AA(pattern) */
